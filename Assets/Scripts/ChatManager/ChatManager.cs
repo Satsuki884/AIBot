@@ -1,16 +1,10 @@
 using System;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Newtonsoft.Json;
-using System.Threading;
-using Newtonsoft.Json.Linq;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 
 public class ChatManager : MonoBehaviour
 {
@@ -23,12 +17,10 @@ public class ChatManager : MonoBehaviour
     [SerializeField] private Button _refreshButtonPrefab;
     private IChat _chat;
     private string apiUrl = "https://api-inference.huggingface.co/models/facebook/blenderbot-3B";
-    private string apiKey;
     private HttpClient httpClient;
     private static readonly TimeSpan requestTimeout = TimeSpan.FromSeconds(100);
 
     private string lastMessage;
-    private string lastResponse;
 
     void Start()
     {
@@ -45,23 +37,12 @@ public class ChatManager : MonoBehaviour
         });
 
         _chatAI.onValueChanged.RemoveAllListeners();
-        // _chatAI.onValueChanged.AddListener((bool isOn) =>
-        // {
-        // if (isOn)
-        // {
         _chat = new ChatAI(requestTimeout, httpClient, apiUrl);
-        // }
-        // else
-        // {
-        //     _chat = new ChatEcho();
-        // }
-        // });
 
         _refreshButtonPrefab.gameObject.SetActive(false);
         _refreshButtonPrefab.onClick.RemoveAllListeners();
         _refreshButtonPrefab.onClick.AddListener(RefreshChat);
 
-        // _chatAI.isOn = true;
         _chatAI.gameObject.SetActive(false);
 
         AppendMessageToChat("AI: " + $"<color=#0bad61> Hello! How can I help you today?</color>");
@@ -82,7 +63,6 @@ public class ChatManager : MonoBehaviour
         try
         {
             string response = await _chat.SendMessageToAI(userMessage);
-            lastResponse = response;
             if (response.Contains("[Error]"))
             {
                 _refreshButtonPrefab.gameObject.SetActive(true);

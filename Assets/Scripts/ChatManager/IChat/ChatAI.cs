@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -25,8 +24,6 @@ public class ChatAI : MonoBehaviour, IChat
 
     public async Task<string> SendMessageToAI(string userMessage)
     {
-        Debug.Log("SendMessage To Ai from ChatAI");
-
         var requestData = new { inputs = userMessage };
         string jsonData = JsonConvert.SerializeObject(requestData);
         var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
@@ -40,14 +37,13 @@ public class ChatAI : MonoBehaviour, IChat
                 Debug.Log(responseText);
 
                 string generatedText = null;
-                // JObject jsonObject = JObject.Parse(responseText);
 
-                if (responseText.TrimStart().StartsWith("{")) // JSON-объект
+                if (responseText.TrimStart().StartsWith("{"))
                 {
                     JObject jsonObject = JObject.Parse(responseText);
                     generatedText = jsonObject["generated_text"]?.ToString();
                 }
-                else if (responseText.TrimStart().StartsWith("[")) // JSON-массив
+                else if (responseText.TrimStart().StartsWith("["))
                 {
                     JArray jsonArray = JArray.Parse(responseText);
                     if (jsonArray.Count > 0)
@@ -59,7 +55,6 @@ public class ChatAI : MonoBehaviour, IChat
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    Debug.LogError($"[Error]: {response.ReasonPhrase}");
                     return $"<color=red> [Error]: {response.ReasonPhrase}</color>";
                 }
                 else if (!string.IsNullOrEmpty(generatedText))
@@ -68,24 +63,20 @@ public class ChatAI : MonoBehaviour, IChat
                 }
                 else
                 {
-                    Debug.LogError("[Error]: No response from AI.");
                     return "<color=red> [Error]: No response from AI.</color>";
                 }
             }
         }
         catch (TaskCanceledException)
         {
-            Debug.LogError(" [Error]: The request has exceeded the waiting time.");
             return "<color=red> [Error]: The request has exceeded the waiting time.</color>";
         }
         catch (HttpRequestException e)
         {
-            Debug.LogError($" [Error]: {e.Message}");
             return $"<color=red> [Error]: {e.Message}</color>";
         }
         catch (Exception e)
         {
-            Debug.LogError($" [Error]: Unexpected error: {e.Message}");
             return $"<color=red> [Error]: Unexpected error: {e.Message}</color>";
         }
     }
