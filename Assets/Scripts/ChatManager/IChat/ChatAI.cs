@@ -13,11 +13,13 @@ public class ChatAI : MonoBehaviour, IChat
 
     private TimeSpan _requestTimeout;
     private HttpClient _httpClient;
+    private string _apiUrl;
 
-    public ChatAI(TimeSpan requestTimeout, HttpClient httpClient)
+    public ChatAI(TimeSpan requestTimeout, HttpClient httpClient, string apiUrl)
     {
         _requestTimeout = requestTimeout;
         _httpClient = httpClient;
+        _apiUrl = apiUrl;
     }
 
 
@@ -33,7 +35,7 @@ public class ChatAI : MonoBehaviour, IChat
         {
             using (var cts = new CancellationTokenSource(_requestTimeout))
             {
-                HttpResponseMessage response = await _httpClient.PostAsync(SaveApiKey.Instance.LoadKey(), content, cts.Token);
+                HttpResponseMessage response = await _httpClient.PostAsync(_apiUrl, content, cts.Token);
                 string responseText = await response.Content.ReadAsStringAsync();
                 Debug.Log(responseText);
 
@@ -58,7 +60,7 @@ public class ChatAI : MonoBehaviour, IChat
                 if (!response.IsSuccessStatusCode)
                 {
                     Debug.LogError($"[Error]: {response.ReasonPhrase}");
-                    return $"<color=red>[Error]: {response.ReasonPhrase}</color>";
+                    return $"<color=red> [Error]: {response.ReasonPhrase}</color>";
                 }
                 else if (!string.IsNullOrEmpty(generatedText))
                 {
@@ -67,24 +69,24 @@ public class ChatAI : MonoBehaviour, IChat
                 else
                 {
                     Debug.LogError("[Error]: No response from AI.");
-                    return "<color=red>[Error]: No response from AI.</color>";
+                    return "<color=red> [Error]: No response from AI.</color>";
                 }
             }
         }
         catch (TaskCanceledException)
         {
-            Debug.LogError("[Error]: The request has exceeded the waiting time.");
-            return "<color=red>[Error]: The request has exceeded the waiting time.</color>";
+            Debug.LogError(" [Error]: The request has exceeded the waiting time.");
+            return "<color=red> [Error]: The request has exceeded the waiting time.</color>";
         }
         catch (HttpRequestException e)
         {
-            Debug.LogError($"[Error]: {e.Message}");
-            return $"<color=red>[Error]: {e.Message}</color>";
+            Debug.LogError($" [Error]: {e.Message}");
+            return $"<color=red> [Error]: {e.Message}</color>";
         }
         catch (Exception e)
         {
-            Debug.LogError($"[Error]: Unexpected error: {e.Message}");
-            return $"<color=red>[Error]: Unexpected error: {e.Message}</color>";
+            Debug.LogError($" [Error]: Unexpected error: {e.Message}");
+            return $"<color=red> [Error]: Unexpected error: {e.Message}</color>";
         }
     }
 }

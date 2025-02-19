@@ -25,6 +25,7 @@ public class SaveApiKey : MonoBehaviour
     void Start()
     {
         apiKeyFilePath = Path.Combine(Application.persistentDataPath, "apikey.txt");
+        Debug.Log("API Key file path: " + apiKeyFilePath);
     }
 
     public void SaveKey(string apiKey)

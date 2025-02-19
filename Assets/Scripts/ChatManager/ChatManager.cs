@@ -28,11 +28,12 @@ public class ChatManager : MonoBehaviour
     private static readonly TimeSpan requestTimeout = TimeSpan.FromSeconds(100);
 
     private string lastMessage;
+    private string lastResponse;
 
     void Start()
     {
         httpClient = new HttpClient { Timeout = requestTimeout };
-        httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + apiKey);
+        httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + SaveApiKey.Instance.LoadKey());
         _sendButton.onClick.RemoveAllListeners();
         _sendButton.onClick.AddListener(async () =>
         {
@@ -48,7 +49,7 @@ public class ChatManager : MonoBehaviour
         // {
         // if (isOn)
         // {
-        _chat = new ChatAI(requestTimeout, httpClient);
+        _chat = new ChatAI(requestTimeout, httpClient, apiUrl);
         // }
         // else
         // {
@@ -76,17 +77,22 @@ public class ChatManager : MonoBehaviour
     {
 
         lastMessage = userMessage;
+        var aiMessage = AppendMessageToAIChat();
 
         try
         {
             string response = await _chat.SendMessageToAI(userMessage);
+            lastResponse = response;
             if (response.Contains("[Error]"))
             {
                 _refreshButtonPrefab.gameObject.SetActive(true);
+                aiMessage.text = "AI: " + $"<color=red>Something is wrong :/\nReload answer or send new message)</color>";
+                StartCoroutine(ScrollToBottomWithDelay());
             }
             else
             {
-                AppendMessageToChat("AI: " + $"<color=#0bad61> {response}</color>");
+                aiMessage.text = "AI: " + $"<color=#0bad61> {response}</color>";
+                StartCoroutine(ScrollToBottomWithDelay());
             }
         }
         catch (Exception e)
@@ -113,11 +119,21 @@ public class ChatManager : MonoBehaviour
     {
         TMP_Text sms = Instantiate(_chatOutput, _content);
         sms.text = message;
-        // _chatOutput.text += "\n" + message;
 
         sms.rectTransform.sizeDelta = new Vector2(sms.rectTransform.sizeDelta.x, sms.preferredHeight);
 
         StartCoroutine(ScrollToBottomWithDelay());
+    }
+
+    TMP_Text AppendMessageToAIChat()
+    {
+        TMP_Text sms = Instantiate(_chatOutput, _content);
+        sms.text = "AI: " + $"<color=#0bad61>Texting . . .</color>";
+
+        sms.rectTransform.sizeDelta = new Vector2(sms.rectTransform.sizeDelta.x, sms.preferredHeight);
+
+        StartCoroutine(ScrollToBottomWithDelay());
+        return sms;
     }
 
     private IEnumerator ScrollToBottomWithDelay()
