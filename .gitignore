@@ -1,0 +1,53 @@
+/Assets/TextMesh Pro
+/ProjectSettings
+*.cache
+/Logs
+/UserSettings
+
+# Ignore Unity specific files
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+AssetStoreTools*
+
+# Ignore auto-generated VS/MD/Consulo/JetBrains Rider project files
+ExportedObj/
+.consulo/
+.vscode/
+.vscode/*
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.pidb.meta
+
+# Ignore Unity Asset Store tools
+AssetStoreTools*
+
+# Ignore crash reports
+sysinfo.txt
+
+# Ignore build results
+*.apk
+*.aab
+*.unitypackage
+
+# Ignore other files
+*.DS_Store
+*.swp
+*.swo
+*.tmp
